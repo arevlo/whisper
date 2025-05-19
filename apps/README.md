@@ -1,91 +1,140 @@
 # Whisper Dictation Tool
 
-A simple command-line tool for speech recognition and dictation using OpenAI's Whisper.
+A simple speech-to-text dictation tool using OpenAI's Whisper for accurate transcription.
 
-## Installation
+## 🚀 Quick Start
 
-1. Make sure you have the required dependencies:
-   ```
-   pip install openai-whisper pyaudio numpy
-   ```
-
-2. Ensure you have FFmpeg installed (required by Whisper for audio processing).
-
-## Basic Usage
-
-Run the dictation tool with default settings:
+Double-click the batch file to start dictation immediately:
 ```
-python dictate.py
+/apps/dictate-spacebar.bat
 ```
 
-This will:
-- Load the "base" Whisper model
-- Record audio for 10 seconds
-- Transcribe your speech
-- Display the result
+Then:
+1. Press **SHIFT+SPACEBAR** to start recording
+2. Speak clearly into your microphone
+3. Press **SHIFT+SPACEBAR** again to stop and transcribe
+4. The text is automatically copied to your clipboard
+5. Press **Ctrl+V** to paste anywhere
+6. Press **ESC** to exit when finished
 
-## Command Line Options
+## 🎤 Shift+Spacebar Dictation Mode
+
+This is the most user-friendly mode for dictation, giving you complete control with Shift+Spacebar key combinations:
+
+```
+python dictate.py --model small --spacebar
+```
+
+### How Shift+Spacebar Mode Works:
+
+1. **START** - Press Shift+Spacebar to begin recording
+2. **SPEAK** - Dictate your text clearly
+3. **STOP** - Press Shift+Spacebar again to finish recording
+4. **COPY** - Text is automatically copied to clipboard
+5. **PASTE** - Use Ctrl+V to paste anywhere
+6. **EXIT** - Press ESC key when done
+
+## 📋 All Command-line Options
 
 | Option | Description |
 |--------|-------------|
-| `--model MODEL` | Choose Whisper model size: tiny, base, small, medium, large, turbo (default: base) |
-| `--language LANG` | Specify language code (e.g., en, es, fr) or "auto" for detection (default: auto) |
-| `--save FILE` | Save transcription to specified file |
-| `--continuous` | Enable continuous dictation mode (keeps recording until Ctrl+C) |
-| `--duration SECONDS` | Set recording duration in seconds (default: 10) |
+| `--model MODEL` | Choose model size: tiny, base, small, medium, large, turbo (default: base) |
+| `--spacebar` | **[Recommended]** Use spacebar to start/stop recording |
+| `--language LANG` | Specify language (e.g., en, es, fr) or "auto" (default) |
+| `--clipboard` | Automatically copy transcription to clipboard |
+| `--autopaste` | Automatically paste text where cursor is pointing |
+| `--delay SECONDS` | Set delay before auto-pasting (default: 1.0) |
+| `--continuous` | Continuous recording mode (Ctrl+C to stop) |
+| `--duration SECONDS` | Set recording duration (default: 10) |
+| `--save FILE` | Save transcriptions to a file |
+| `--interactive` | Run in interactive command mode |
 | `--skip-check` | Skip the microphone volume check |
 
-## Examples
+## 💻 Batch Files for Easy Use
 
-1. **Use a better model for more accurate transcription**:
-   ```
-   python dictate.py --model small
-   ```
+The apps folder includes these batch files for quick access:
 
-2. **For continuous dictation** (keeps running until stopped):
-   ```
-   python dictate.py --continuous
-   ```
+| File | Description |
+|------|-------------|
+| `dictate-spacebar.bat` | **[Recommended]** Starts Shift+Spacebar-controlled dictation mode |
+| `dictate-clipboard.bat` | Starts continuous recording mode with clipboard |
 
-3. **Specify the language** (for more accurate results):
-   ```
-   python dictate.py --language en
-   ```
+## 📦 Installation
 
-4. **Save the transcription to a file**:
+1. Install required packages:
    ```
-   python dictate.py --save dictation_result.txt
+   pip install openai-whisper pyaudio numpy pyperclip pyautogui keyboard
    ```
 
-5. **Full example with all options**:
+2. Install FFmpeg (required by Whisper for audio processing):
+   - Windows (using Chocolatey): `choco install ffmpeg`
+   - Windows (using Scoop): `scoop install ffmpeg`
+   - macOS: `brew install ffmpeg`
+   - Ubuntu/Debian: `sudo apt update && sudo apt install ffmpeg`
+
+## 🔧 Other Modes
+
+### Interactive Mode
+```
+python dictate.py --interactive
+```
+
+This mode preserves your microphone selection and lets you change settings between dictations using commands:
+
+| Command | Description |
+|---------|-------------|
+| `record [duration]` | Start recording |
+| `language [code]` | Set language |
+| `model [name]` | Change model |
+| `help` | Show all commands |
+| `exit` | Exit program |
+
+### Continuous Mode
+```
+python dictate.py --continuous
+```
+Records continuously in fixed intervals until stopped with Ctrl+C.
+
+## 📝 Tips for Better Dictation
+
+1. **Using Shift+Spacebar** prevents accidental activation when typing in other apps
+
+2. **Choose the right model**:
+   - `tiny`: Fastest but least accurate
+   - `small`: Good balance of speed/accuracy for most users
+   - `medium`: More accurate but slower
+   - `large`: Most accurate but slowest
+
+2. **Speak clearly and at a moderate pace**
+
+3. **Position your microphone properly** (6-12 inches from your mouth)
+
+4. **Specify your language** for better accuracy:
    ```
-   python dictate.py --model small --language en --continuous --duration 5 --save notes.txt
+   python dictate.py --spacebar --language en
    ```
 
-## Microphone Selection
+5. **Review your microphone settings** in Windows Sound Control Panel
 
-When running the script, it will:
-1. Display a list of available microphones
-2. Allow you to select a specific microphone
-3. Perform a volume check to ensure your microphone is working properly
-
-## Troubleshooting
+## ⚠️ Troubleshooting
 
 1. **If you have microphone issues**:
-   - Check your system's sound settings to ensure your microphone is set as the default input device
-   - Increase microphone volume in system settings
+   - Ensure your microphone is set as the default input device
+   - Check microphone volume in system settings
    - Try a different microphone if available
 
 2. **If transcription quality is poor**:
-   - Use a more powerful model (`--model medium` or `--model large`)
-   - Speak more clearly and avoid background noise
+   - Use `--model medium` for better accuracy
+   - Reduce background noise
    - Position the microphone closer to your mouth
 
-3. **If the script takes too long to transcribe**:
-   - Use a smaller model (`--model tiny` or `--model base`)
-   - Reduce the recording duration (`--duration 3`)
+3. **If keyboard module gives errors**:
+   - Run the command prompt as administrator
+   - On macOS/Linux, you may need additional permissions
 
 ## Notes
 
 - The script creates temporary audio files that are deleted after transcription
-- Press Ctrl+C to stop the dictation process at any time
+- Shift+Spacebar mode gives you precise control over when recording starts and stops
+- Using Shift+Spacebar instead of just Spacebar prevents accidental activations
+- The text is automatically copied to clipboard for easy pasting
