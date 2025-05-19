@@ -4,9 +4,16 @@ A simple speech-to-text dictation tool using OpenAI's Whisper for accurate trans
 
 ## 🚀 Quick Start
 
+### On Windows:
 Double-click the batch file to start dictation immediately:
 ```
 /apps/dictate-spacebar.bat
+```
+
+### On macOS/Linux:
+Run the Python script directly:
+```
+python3 apps/dictate.py
 ```
 
 Then:
@@ -14,7 +21,7 @@ Then:
 2. Speak clearly into your microphone
 3. Press **SHIFT+SPACEBAR** again to stop and transcribe
 4. The text is automatically copied to your clipboard
-5. Press **Ctrl+V** to paste anywhere
+5. Press **Ctrl+V** (Windows/Linux) or **Command+V** (macOS) to paste anywhere
 6. Press **ESC** to exit when finished
 
 ## 🎤 Shift+Spacebar Dictation Mode
@@ -22,8 +29,13 @@ Then:
 This is the most user-friendly mode for dictation, giving you complete control with Shift+Spacebar key combinations:
 
 ```
-python dictate.py --model small --spacebar
+python dictate.py
 ```
+
+The script now uses these settings by default:
+- Small model (better accuracy)
+- Shift+Spacebar control
+- Automatic clipboard copy
 
 ### How Shift+Spacebar Mode Works:
 
@@ -31,17 +43,17 @@ python dictate.py --model small --spacebar
 2. **SPEAK** - Dictate your text clearly
 3. **STOP** - Press Shift+Spacebar again to finish recording
 4. **COPY** - Text is automatically copied to clipboard
-5. **PASTE** - Use Ctrl+V to paste anywhere
+5. **PASTE** - Use Ctrl+V (Win/Linux) or Command+V (Mac) to paste anywhere
 6. **EXIT** - Press ESC key when done
 
 ## 📋 All Command-line Options
 
 | Option | Description |
 |--------|-------------|
-| `--model MODEL` | Choose model size: tiny, base, small, medium, large, turbo (default: base) |
-| `--spacebar` | **[Recommended]** Use spacebar to start/stop recording |
+| `--model MODEL` | Choose model size: tiny, base, small, medium, large, turbo (default: small) |
+| `--no-spacebar` | Disable the default Shift+Spacebar mode |
 | `--language LANG` | Specify language (e.g., en, es, fr) or "auto" (default) |
-| `--clipboard` | Automatically copy transcription to clipboard |
+| `--clipboard` | Automatically copy transcription to clipboard (enabled by default) |
 | `--autopaste` | Automatically paste text where cursor is pointing |
 | `--delay SECONDS` | Set delay before auto-pasting (default: 1.0) |
 | `--continuous` | Continuous recording mode (Ctrl+C to stop) |
@@ -50,27 +62,65 @@ python dictate.py --model small --spacebar
 | `--interactive` | Run in interactive command mode |
 | `--skip-check` | Skip the microphone volume check |
 
-## 💻 Batch Files for Easy Use
+## 💻 Launcher Scripts
 
-The apps folder includes these batch files for quick access:
+### Windows
+The apps folder includes these batch files for quick access (Windows only):
 
 | File | Description |
 |------|-------------|
-| `dictate-spacebar.bat` | **[Recommended]** Starts Shift+Spacebar-controlled dictation mode |
-| `dictate-clipboard.bat` | Starts continuous recording mode with clipboard |
+| `wdictate.bat` | Simple command to run the dictation tool |
+| `whisper-dictate.bat` | Alternative command name to avoid conflicts |
+| `dictate-spacebar.bat` | Starts Shift+Spacebar-controlled dictation mode |
+| `create-shortcut.bat` | Creates a desktop shortcut for easy access |
+
+### macOS/Linux
+For macOS and Linux, create a shell script:
+
+```bash
+#!/bin/bash
+# Save this as dictate.sh in the apps directory
+cd "$(dirname "$0")"
+python3 dictate.py "$@"
+```
+
+Then make it executable:
+```
+chmod +x apps/dictate.sh
+```
 
 ## 📦 Installation
 
 1. Install required packages:
    ```
+   # For Windows:
    pip install openai-whisper pyaudio numpy pyperclip pyautogui keyboard
+
+   # For macOS:
+   pip3 install openai-whisper pyaudio numpy pyperclip pyautogui keyboard
    ```
 
 2. Install FFmpeg (required by Whisper for audio processing):
    - Windows (using Chocolatey): `choco install ffmpeg`
    - Windows (using Scoop): `scoop install ffmpeg`
    - macOS: `brew install ffmpeg`
-   - Ubuntu/Debian: `sudo apt update && sudo apt install ffmpeg`
+   - Ubuntu/Linux: `sudo apt update && sudo apt install ffmpeg`
+
+3. Install PyAudio (which can be tricky on some systems):
+   - Windows: If the normal pip install fails, try:
+     ```
+     pip install pipwin
+     pipwin install pyaudio
+     ```
+   - macOS: You may need to install portaudio first:
+     ```
+     brew install portaudio
+     pip3 install pyaudio
+     ```
+   - Linux: Install dependencies first:
+     ```
+     sudo apt install python3-pyaudio portaudio19-dev
+     ```
 
 ## 🔧 Other Modes
 
@@ -91,7 +141,7 @@ This mode preserves your microphone selection and lets you change settings betwe
 
 ### Continuous Mode
 ```
-python dictate.py --continuous
+python dictate.py --continuous --no-spacebar
 ```
 Records continuously in fixed intervals until stopped with Ctrl+C.
 
@@ -101,20 +151,35 @@ Records continuously in fixed intervals until stopped with Ctrl+C.
 
 2. **Choose the right model**:
    - `tiny`: Fastest but least accurate
-   - `small`: Good balance of speed/accuracy for most users
+   - `small`: Good balance of speed/accuracy for most users (default)
    - `medium`: More accurate but slower
    - `large`: Most accurate but slowest
 
-2. **Speak clearly and at a moderate pace**
+3. **Speak clearly and at a moderate pace**
 
-3. **Position your microphone properly** (6-12 inches from your mouth)
+4. **Position your microphone properly** (6-12 inches from your mouth)
 
-4. **Specify your language** for better accuracy:
+5. **Specify your language** for better accuracy:
    ```
-   python dictate.py --spacebar --language en
+   python dictate.py --language en
    ```
 
-5. **Review your microphone settings** in Windows Sound Control Panel
+## 🖥️ Platform-Specific Notes
+
+### Windows
+- The .bat files provide convenient ways to run the tool
+- Run Command Prompt as Administrator if keyboard detection has issues
+- Desktop shortcut creation is supported
+
+### macOS
+- Use `Command+V` instead of `Ctrl+V` to paste
+- You may need to grant permission for keyboard monitoring in System Preferences
+- For keyboard issues, try adding Terminal to Accessibility permissions
+- The batch files (.bat) won't work - use the Python command directly
+
+### Linux
+- Additional packages may be needed for audio: `sudo apt install libasound-dev`
+- For keyboard monitoring, X11 may require: `sudo apt install python3-dev python3-xlib`
 
 ## ⚠️ Troubleshooting
 
@@ -129,8 +194,13 @@ Records continuously in fixed intervals until stopped with Ctrl+C.
    - Position the microphone closer to your mouth
 
 3. **If keyboard module gives errors**:
-   - Run the command prompt as administrator
-   - On macOS/Linux, you may need additional permissions
+   - Windows: Run the command prompt as administrator
+   - macOS: Add Terminal to Accessibility permissions
+   - Linux: Make sure X11 is running and you have appropriate permissions
+
+4. **If the script gets stuck**:
+   - Windows: Use the provided `kill-dictation.bat`
+   - macOS/Linux: Use `killall python` or `killall python3`
 
 ## Notes
 
@@ -138,3 +208,4 @@ Records continuously in fixed intervals until stopped with Ctrl+C.
 - Shift+Spacebar mode gives you precise control over when recording starts and stops
 - Using Shift+Spacebar instead of just Spacebar prevents accidental activations
 - The text is automatically copied to clipboard for easy pasting
+- For macOS, edit the script to use `command+v` instead of `ctrl+v` for pasting

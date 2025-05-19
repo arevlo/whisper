@@ -1,4 +1,6 @@
 @echo off
-echo Whisper Dictation Tool
-echo.
-python %~dp0\dictate.py %*
+REM This is a simple batch file that runs the dictation tool with default settings
+REM Simply run 'dictate' from the command line
+
+cd /d %~dp0
+python dictate.py

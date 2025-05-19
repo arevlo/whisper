@@ -50,7 +50,7 @@ def signal_handler(sig, frame):
 def parse_arguments():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Whisper Dictation Tool")
-    parser.add_argument("--model", default="base", choices=["tiny", "base", "small", "medium", "large", "turbo"],
+    parser.add_argument("--model", default="small", choices=["tiny", "base", "small", "medium", "large", "turbo"],
                         help="Whisper model size (smaller=faster, larger=more accurate)")
     parser.add_argument("--language", default=None, 
                         help="Language code (e.g., en, es, fr) or 'auto' for auto-detection")
@@ -62,17 +62,26 @@ def parse_arguments():
                         help="Recording duration in seconds (default: 10)")
     parser.add_argument("--skip-check", action="store_true",
                         help="Skip microphone volume check")
-    parser.add_argument("--clipboard", action="store_true",
-                        help="Copy transcription to clipboard")
+    parser.add_argument("--clipboard", action="store_true", default=True,
+                        help="Automatically copy transcription to clipboard")
     parser.add_argument("--autopaste", action="store_true",
                         help="Automatically paste transcription where cursor is pointing (implies --clipboard)")
     parser.add_argument("--delay", type=float, default=1.0,
                         help="Delay in seconds before pasting (only used with --autopaste, default: 1.0)")
     parser.add_argument("--interactive", action="store_true",
                         help="Run in interactive mode, waiting for commands between dictations")
-    parser.add_argument("--spacebar", action="store_true",
-                        help="Use spacebar to control recording (press to start/stop)")
-    return parser.parse_args()
+    parser.add_argument("--spacebar", action="store_true", default=True,
+                        help="Use Shift+Spacebar to control recording (press to start/stop)")
+    parser.add_argument("--no-spacebar", action="store_true",
+                        help="Disable Shift+Spacebar mode")
+    
+    args = parser.parse_args()
+    
+    # If --no-spacebar is specified, disable spacebar mode
+    if args.no_spacebar:
+        args.spacebar = False
+    
+    return args
 
 def list_microphones():
     """List all available microphones"""
@@ -401,8 +410,11 @@ def run_spacebar_mode(model, args, device_index=None):
                 if args.autopaste:
                     print(f"🖱️ Auto-pasting in {args.delay} seconds... (Move cursor to desired location)")
                     time.sleep(args.delay)
-                    pyautogui.hotkey('ctrl', 'v')  # For Windows/Linux
-                    # For macOS: pyautogui.hotkey('command', 'v')
+                    # Detect platform and use appropriate paste command
+                    if sys.platform == "darwin":  # macOS
+                        pyautogui.hotkey('command', 'v')
+                    else:  # Windows/Linux
+                        pyautogui.hotkey('ctrl', 'v')
                     print("✅ Pasted!")
             
             # Clean up
@@ -531,8 +543,11 @@ def run_interactive_mode(model, args):
                         if settings["autopaste"]:
                             print(f"Auto-pasting in {settings['delay']} seconds... (Move cursor to desired location)")
                             time.sleep(settings["delay"])
-                            pyautogui.hotkey('ctrl', 'v')  # For Windows/Linux
-                            # For macOS: pyautogui.hotkey('command', 'v')
+                            # Detect platform and use appropriate paste command
+                            if sys.platform == "darwin":  # macOS
+                                pyautogui.hotkey('command', 'v')
+                            else:  # Windows/Linux
+                                pyautogui.hotkey('ctrl', 'v')
                             print("(Pasted)")
                     
                     # Clean up
@@ -579,7 +594,11 @@ def run_interactive_mode(model, args):
                                 if settings["autopaste"]:
                                     print(f"Auto-pasting in {settings['delay']} seconds...")
                                     time.sleep(settings["delay"])
-                                    pyautogui.hotkey('ctrl', 'v')
+                                    # Detect platform and use appropriate paste command
+                                    if sys.platform == "darwin":  # macOS
+                                        pyautogui.hotkey('command', 'v')
+                                    else:  # Windows/Linux
+                                        pyautogui.hotkey('ctrl', 'v')
                                     print("(Pasted)")
                             
                             # Clean up
@@ -711,7 +730,7 @@ def main():
         if not args.skip_check:
             check_microphone_volume(device_index)
         
-        # Check if running in spacebar mode
+        # Check if running in spacebar mode (default)
         if args.spacebar:
             run_spacebar_mode(model, args, device_index)
             return
